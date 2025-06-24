@@ -1,8 +1,8 @@
-# Import necessary libraries (updated to include matplotlib and seaborn)
+# Import necessary libraries
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, accuracy_score, silhouette_score
+from sklearn.metrics import mean_squared_error, accuracy_score, silhouette_score, confusion_matrix # Added confusion_matrix here
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import (
     make_regression, make_classification, make_blobs,
@@ -23,7 +23,6 @@ from sklearn.decomposition import PCA
 
 # Deep Learning (Neural Networks) - using TensorFlow/Keras
 import tensorflow as tf
-from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, LSTM, Embedding
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -35,9 +34,11 @@ import seaborn as sns
 
 print("--- Starting ML Algorithm Implementations with Larger Datasets ---")
 
-# ... (rest of your code will be modified below)
 # --- 1. Linear Regression (with California Housing Dataset) ---
 print("\n--- 1. Linear Regression ---")
+# Objective: Predict median house values (continuous) based on various features.
+# Definition: Models linear relationship between input features and continuous output.
+# Load California Housing dataset
 housing = fetch_california_housing()
 X_reg = housing.data
 y_reg = housing.target
@@ -47,7 +48,7 @@ X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(
     X_reg, y_reg, test_size=0.2, random_state=42
 )
 
-# Scale features
+# Scale features (important for many ML models, especially regression with varied feature scales)
 scaler_reg = StandardScaler()
 X_train_reg_scaled = scaler_reg.fit_transform(X_train_reg)
 X_test_reg_scaled = scaler_reg.transform(X_test_reg)
@@ -59,7 +60,7 @@ linear_model.fit(X_train_reg_scaled, y_train_reg)
 # Make predictions
 y_pred_reg = linear_model.predict(X_test_reg_scaled)
 
-# Evaluate the model
+# Evaluate the model (Objective: Minimize Mean Squared Error)
 mse_linear = mean_squared_error(y_test_reg, y_pred_reg)
 print(f"Linear Regression MSE on California Housing: {mse_linear:.2f}")
 
@@ -87,6 +88,7 @@ plt.grid(True, linestyle='--', alpha=0.6)
 
 plt.tight_layout() # Adjust layout to prevent overlap
 plt.show() # Display the plots
+
 
 # --- 2. Logistic Regression (with Iris Dataset) ---
 print("\n--- 2. Logistic Regression ---")
@@ -118,46 +120,6 @@ y_pred_clf_lr = logistic_model.predict(X_test_clf_iris_scaled)
 accuracy_lr = accuracy_score(y_test_clf_iris, y_pred_clf_lr)
 print(f"Logistic Regression Accuracy on Iris: {accuracy_lr:.2f}")
 
-# ... (previous code for Logistic Regression, DT, RF, SVM, KNN, GNB)
-
-# Store accuracies for comparison
-classifier_accuracies = {
-    'Logistic Regression': accuracy_lr,
-    'Decision Tree': accuracy_dt,
-    'Random Forest': accuracy_rf,
-    'SVM': accuracy_svm,
-    'K-Nearest Neighbors': accuracy_knn,
-    'Naive Bayes': accuracy_gnb
-}
-
-print("\n--- Classification Model Accuracies ---")
-for model, acc in classifier_accuracies.items():
-    print(f"{model}: {acc:.2f}")
-
-# --- Classification Plotting ---
-
-# Plot 1: Confusion Matrix for Logistic Regression (Example)
-from sklearn.metrics import confusion_matrix
-plt.figure(figsize=(10, 5))
-
-plt.subplot(1, 2, 1)
-cm_lr = confusion_matrix(y_test_clf_iris, y_pred_clf_lr)
-sns.heatmap(cm_lr, annot=True, fmt='d', cmap='Blues',
-            xticklabels=iris.target_names, yticklabels=iris.target_names)
-plt.title('Logistic Regression Confusion Matrix (Iris)')
-plt.xlabel('Predicted Label')
-plt.ylabel('True Label')
-
-# Plot 2: Bar Chart of Classifier Accuracies
-plt.subplot(1, 2, 2)
-sns.barplot(x=list(classifier_accuracies.keys()), y=list(classifier_accuracies.values()), palette='viridis')
-plt.title('Accuracy Comparison of Classification Models (Iris)')
-plt.ylabel('Accuracy')
-plt.ylim(0.0, 1.0) # Accuracy is between 0 and 1
-plt.xticks(rotation=45, ha='right') # Rotate labels for readability
-
-plt.tight_layout()
-plt.show()
 
 # --- 3. Decision Tree (Classification with Iris Dataset) ---
 print("\n--- 3. Decision Tree (Classification) ---")
@@ -259,7 +221,47 @@ accuracy_gnb = accuracy_score(y_test_clf_iris, y_pred_gnb)
 print(f"Naive Bayes Classifier Accuracy on Iris: {accuracy_gnb:.2f}")
 
 
+# Store accuracies for comparison (MOVED TO HERE, after all models are run)
+classifier_accuracies = {
+    'Logistic Regression': accuracy_lr,
+    'Decision Tree': accuracy_dt,
+    'Random Forest': accuracy_rf,
+    'SVM': accuracy_svm,
+    'K-Nearest Neighbors': accuracy_knn,
+    'Naive Bayes': accuracy_gnb
+}
+
+print("\n--- Classification Model Accuracies ---")
+for model, acc in classifier_accuracies.items():
+    print(f"{model}: {acc:.2f}")
+
+# --- Classification Plotting ---
+
+# Plot 1: Confusion Matrix for Logistic Regression (Example)
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
+cm_lr = confusion_matrix(y_test_clf_iris, y_pred_clf_lr)
+sns.heatmap(cm_lr, annot=True, fmt='d', cmap='Blues',
+            xticklabels=iris.target_names, yticklabels=iris.target_names)
+plt.title('Logistic Regression Confusion Matrix (Iris)')
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+
+# Plot 2: Bar Chart of Classifier Accuracies
+plt.subplot(1, 2, 2)
+sns.barplot(x=list(classifier_accuracies.keys()), y=list(classifier_accuracies.values()), palette='viridis')
+plt.title('Accuracy Comparison of Classification Models (Iris)')
+plt.ylabel('Accuracy')
+plt.ylim(0.0, 1.0) # Accuracy is between 0 and 1
+plt.xticks(rotation=45, ha='right') # Rotate labels for readability
+
+plt.tight_layout()
+plt.show()
+
+
 # --- 8. K-Means Clustering (Larger Synthetic Blobs Dataset) ---
+# Removed the duplicate section here
 print("\n--- 8. K-Means Clustering ---")
 # Objective: Discover natural groupings/clusters within a dataset.
 # Definition: Partitions data into K clusters based on similarity (distance to centroid).
@@ -282,27 +284,10 @@ else:
     print("Cannot calculate Silhouette Score with current cluster configuration.")
 print(f"First 10 cluster labels: {labels[:10]}")
 
-# --- 8. K-Means Clustering ---
-print("\n--- 8. K-Means Clustering ---")
-X_clusters, y_true = make_blobs(n_samples=1000, centers=3, cluster_std=0.75, random_state=0)
-
-kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
-kmeans.fit(X_clusters)
-
-labels = kmeans.labels_
-centroids = kmeans.cluster_centers_ # Get the cluster centroids
-
-if len(np.unique(labels)) > 1 and len(np.unique(labels)) < len(X_clusters) - 1:
-    silhouette_avg = silhouette_score(X_clusters, labels)
-    print(f"K-Means Silhouette Score (1000 samples): {silhouette_avg:.2f}")
-else:
-    print("Cannot calculate Silhouette Score with current cluster configuration.")
-print(f"First 10 cluster labels: {labels[:10]}")
-
 # --- K-Means Plotting ---
 plt.figure(figsize=(8, 6))
 sns.scatterplot(x=X_clusters[:, 0], y=X_clusters[:, 1], hue=labels, palette='viridis', legend='full', s=50, alpha=0.7)
-plt.scatter(centroids[:, 0], centroids[:, 1], marker='X', s=200, color='red', label='Centroids', edgecolors='black')
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], marker='X', s=200, color='red', label='Centroids', edgecolors='black')
 plt.title('K-Means Clustering with 3 Clusters')
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
@@ -314,6 +299,8 @@ plt.show()
 # Sum of squared distances of samples to their closest cluster center.
 wcss = []
 for i in range(1, 11): # Try k from 1 to 10
+    # Suppress KMeans warning about 'init' being deprecated in 1.4 for 'n_init'
+    # By setting n_init explicitly, you usually avoid it.
     kmeans_elbow = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=42)
     kmeans_elbow.fit(X_clusters)
     wcss.append(kmeans_elbow.inertia_) # Inertia is the WCSS
@@ -326,42 +313,93 @@ plt.ylabel('Within-Cluster Sum of Squares (WCSS)')
 plt.grid(True, linestyle='--', alpha=0.6)
 plt.show()
 
+
 # --- 9. Principal Component Analysis (PCA) (Larger Synthetic Data) ---
 print("\n--- 9. Principal Component Analysis (PCA) ---")
 # Objective: Reduce the dimensionality of the dataset while retaining most of its variance.
 # Definition: Dimensionality reduction technique that transforms data to a new lower-dimensional space.
 # Generate high-dimensional data with more samples
-X_high_dim, _ = make_classification(n_samples=500, n_features=20, n_informative=10, n_redundant=0, random_state=42)
+X_high_dim, y_true_pca = make_classification(n_samples=500, n_features=20, n_informative=10, n_redundant=0, random_state=42)
+
+# It's good practice to scale data before PCA
+scaler_pca = StandardScaler()
+X_high_dim_scaled = scaler_pca.fit_transform(X_high_dim)
 
 # Create and apply PCA
 pca = PCA(n_components=5) # Reduce to 5 principal components
-X_pca = pca.fit_transform(X_high_dim)
+X_pca = pca.fit_transform(X_high_dim_scaled) # Use scaled data
 
 print(f"Original data shape: {X_high_dim.shape}")
 print(f"Reduced data shape (5 components): {X_pca.shape}")
 print(f"Explained variance ratio of components: {pca.explained_variance_ratio_}")
 print(f"Total explained variance: {pca.explained_variance_ratio_.sum():.2f}")
 
+# --- PCA Plotting ---
+plt.figure(figsize=(10, 5))
+
+# Plot 1: Explained Variance Ratio
+plt.subplot(1, 2, 1)
+plt.bar(range(1, len(pca.explained_variance_ratio_) + 1), pca.explained_variance_ratio_)
+plt.title('Explained Variance Ratio per Principal Component')
+plt.xlabel('Principal Component')
+plt.ylabel('Explained Variance Ratio')
+plt.xticks(range(1, len(pca.explained_variance_ratio_) + 1))
+plt.grid(axis='y', linestyle='--', alpha=0.6)
+
+# Plot 2: Cumulative Explained Variance
+cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
+plt.subplot(1, 2, 2)
+plt.plot(range(1, len(cumulative_variance) + 1), cumulative_variance, marker='o', linestyle='-')
+plt.title('Cumulative Explained Variance')
+plt.xlabel('Number of Principal Components')
+plt.ylabel('Cumulative Explained Variance')
+plt.xticks(range(1, len(cumulative_variance) + 1))
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.tight_layout()
+plt.show()
+
+# If you were to reduce to 2 components, you could plot them:
+# pca_2d = PCA(n_components=2)
+# X_pca_2d = pca_2d.fit_transform(X_high_dim_scaled)
+# plt.figure(figsize=(8, 6))
+# sns.scatterplot(x=X_pca_2d[:, 0], y=X_pca_2d[:, 1], hue=y_true_pca, palette='deep', alpha=0.7)
+# plt.title('PCA 2 Components (Color by True Class)')
+# plt.xlabel('Principal Component 1')
+# plt.ylabel('Principal Component 2')
+# plt.grid(True, linestyle='--', alpha=0.6)
+# plt.show()
+
 
 # --- 10. Artificial Neural Network (MLP for Classification) ---
 print("\n--- 10. Artificial Neural Network (MLP for Classification) ---")
+# Objective: Classify Iris flower species using a neural network.
+# Definition: A basic neural network with input, hidden, and output layers.
+# Using the Iris dataset (X_clf_iris, y_clf_iris)
+
+# Scale features for ANN
 scaler_mlp = StandardScaler()
 X_train_scaled_mlp = scaler_mlp.fit_transform(X_train_clf_iris)
 X_test_scaled_mlp = scaler_mlp.transform(X_test_clf_iris)
 
+# Build the MLP model
+# Output layer changed to Dense(3, activation='softmax') for 3 classes in Iris
 mlp_model = Sequential([
-    Dense(64, activation='relu', input_shape=(X_train_scaled_mlp.shape[1],)),
-    Dense(32, activation='relu'),
-    Dense(3, activation='softmax')
+    Dense(64, activation='relu', input_shape=(X_train_scaled_mlp.shape[1],)), # Input layer + 1st hidden layer
+    Dense(32, activation='relu'), # 2nd hidden layer
+    Dense(3, activation='softmax') # Output layer for multi-class classification (Iris has 3 classes)
 ])
 
+# Compile the model
 mlp_model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
+                  loss='sparse_categorical_crossentropy', # Use sparse_categorical_crossentropy for integer labels
                   metrics=['accuracy'])
 
-# Store the history object
-mlp_history = mlp_model.fit(X_train_scaled_mlp, y_train_clf_iris, epochs=50, batch_size=16, verbose=0)
+# Train the model
+# Verbose=0 hides training output, set to 1 for progress updates
+mlp_history = mlp_model.fit(X_train_scaled_mlp, y_train_clf_iris, epochs=50, batch_size=16, verbose=0) # Increased epochs for better learning
 
+# Evaluate the model
 loss_mlp, accuracy_mlp = mlp_model.evaluate(X_test_scaled_mlp, y_test_clf_iris, verbose=0)
 print(f"MLP Classifier Accuracy on Iris: {accuracy_mlp:.2f}")
 
@@ -392,36 +430,45 @@ plt.show()
 
 # --- 11. Convolutional Neural Network (CNN) (Synthetic Image Data) ---
 print("\n--- 11. Convolutional Neural Network (CNN for Image Classification) ---")
-num_samples = 500
-img_rows, img_cols = 32, 32
-num_classes = 5
+# Objective: Classify synthetic images. For real applications, this would be image recognition.
+# Definition: Specialized neural network for processing grid-like data like images.
+# For real CNN applications, you would load large image datasets like MNIST, Fashion MNIST, CIFAR-10.
+num_samples = 500 # Increased samples
+img_rows, img_cols = 32, 32 # Larger image size
+num_classes = 5 # More classes
 
+# Create random images (values between 0 and 1)
 X_img = np.random.rand(num_samples, img_rows, img_cols)
-y_img = np.random.randint(0, num_classes, num_samples)
+y_img = np.random.randint(0, num_classes, num_samples) # Random labels
 
+# Reshape data for CNN input (add channel dimension)
 X_img = X_img.reshape(num_samples, img_rows, img_cols, 1)
 
+# Split data
 X_train_img, X_test_img, y_train_img, y_test_img = train_test_split(
     X_img, y_img, test_size=0.2, random_state=42
 )
 
+# Build the CNN model
 cnn_model = Sequential([
     Conv2D(32, (3, 3), activation='relu', input_shape=(img_rows, img_cols, 1)),
     MaxPooling2D((2, 2)),
     Conv2D(64, (3, 3), activation='relu'),
     MaxPooling2D((2, 2)),
-    Flatten(),
+    Flatten(), # Flatten the 2D feature maps into a 1D vector
     Dense(128, activation='relu'),
-    Dense(num_classes, activation='softmax')
+    Dense(num_classes, activation='softmax') # Output layer for multi-class classification
 ])
 
+# Compile the model
 cnn_model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
+                  loss='sparse_categorical_crossentropy', # Use sparse_categorical_crossentropy for integer labels
                   metrics=['accuracy'])
 
-# Store the history object
+# Train the model
 cnn_history = cnn_model.fit(X_train_img, y_train_img, epochs=10, batch_size=32, verbose=0)
 
+# Evaluate the model
 loss_cnn, accuracy_cnn = cnn_model.evaluate(X_test_img, y_test_img, verbose=0)
 print(f"CNN Classifier Accuracy (synthetic images): {accuracy_cnn:.2f}")
 
@@ -452,40 +499,48 @@ plt.show()
 
 # --- 12. Recurrent Neural Network (LSTM) (Synthetic Sequence Data) ---
 print("\n--- 12. Recurrent Neural Network (LSTM for Sequence Classification) ---")
+# Objective: Classify short text sequences. For real applications, this would be sentiment analysis, translation, etc.
+# Definition: Handles sequential data by maintaining a hidden state/memory. LSTMs use gates to manage long-term dependencies.
+# For real LSTM applications, you would use large text corpora (e.g., IMDB reviews, news articles) or time series data.
 sentences = [
     "this is a very good and positive movie", "this is a totally bad and negative movie", "great film, really enjoyed it",
     "terrible acting, wasted my time", "absolutely loved the plot and characters", "hated every minute, total garbage",
     "a must see for everyone", "avoid at all costs, worst movie ever",
     "happy to recommend this one", "disappointing and boring", "excellent storyline", "very dull experience"
 ]
-labels_seq = np.array([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+labels_seq = np.array([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]) # 1 for positive, 0 for negative
 
+# Tokenize and pad sequences
 tokenizer = Tokenizer(num_words=100, oov_token="<unk>")
 tokenizer.fit_on_texts(sentences)
 sequences = tokenizer.texts_to_sequences(sentences)
-padded_sequences = pad_sequences(sequences, maxlen=15, padding='post')
+padded_sequences = pad_sequences(sequences, maxlen=15, padding='post') # Pad to a max length of 15, post-padding
 
+# Split data
 X_train_seq, X_test_seq, y_train_seq, y_test_seq = train_test_split(
-    padded_sequences, labels_seq, test_size=0.25, random_state=42
+    padded_sequences, labels_seq, test_size=0.25, random_state=42 # Increased test size for more test data
 )
 
 vocab_size = len(tokenizer.word_index) + 1
-embedding_dim = 32
+embedding_dim = 32 # Increased embedding dimension
 max_len = 15
 
+# Build the LSTM model
 lstm_model = Sequential([
-    Embedding(vocab_size, embedding_dim, input_length=max_len),
-    LSTM(64),
-    Dense(1, activation='sigmoid')
+    Embedding(vocab_size, embedding_dim, input_length=max_len), # Converts words to dense vectors
+    LSTM(64), # LSTM layer with 64 units
+    Dense(1, activation='sigmoid') # Output layer for binary classification
 ])
 
+# Compile the model
 lstm_model.compile(optimizer='adam',
                    loss='binary_crossentropy',
                    metrics=['accuracy'])
 
-# Store the history object
-lstm_history = lstm_model.fit(X_train_seq, y_train_seq, epochs=20, batch_size=8, verbose=0)
+# Train the model
+lstm_history = lstm_model.fit(X_train_seq, y_train_seq, epochs=20, batch_size=8, verbose=0) # Increased epochs and smaller batch size
 
+# Evaluate the model
 loss_lstm, accuracy_lstm = lstm_model.evaluate(X_test_seq, y_test_seq, verbose=0)
 print(f"LSTM Classifier Accuracy (synthetic text): {accuracy_lstm:.2f}")
 
