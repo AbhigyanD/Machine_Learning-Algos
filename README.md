@@ -116,22 +116,25 @@ The script automatically generates:
 ### Linear Regression:
 - Actual vs. Predicted
 - Residuals plot
-
+![Alt text](image.png)
 ### Classification:
 - Accuracy bar chart
 - Confusion matrix (where applicable)
-
+![Alt text](image-1.png)
 ### K-Means Clustering:
 - Cluster plot
 - Elbow method plot
-
+![Alt text](image-2.png)
+![Alt text](image-3.png)
 ### PCA:
 - Explained variance bar chart
 - Cumulative variance line plot
-
+![Alt text](image-4.png)
 ### Neural Networks:
 - Training loss and accuracy plots
-
+![Alt text](image-5.png)
+![Alt text](image-6.png)
+![Alt text](image-7.png)
 ---
 
 ## 🛠 Troubleshooting (VS Code & Python Environments)
